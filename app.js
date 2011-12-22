@@ -4,14 +4,16 @@ if(process.env.VCAP_SERVICES){
 }
 else{
   var mongo = {
-    "hostname":"localhost",
-    "port":27017,
-    "username":"",
-    "password":"", 
+    "hostname":"staff.mongohq.com",
+    "port":10053,
+    "username":"nathanielmo",
+    "password":"Password12",
     "name":"",
-    "db":""
+    "db":"dcexp"
   }
 }
+
+//mongodb://<user>:<password>@staff.mongohq.com:10053/dcexp 
 
 var generate_mongo_url = function(obj){
   obj.hostname = (obj.hostname || 'localhost');
@@ -19,7 +21,7 @@ var generate_mongo_url = function(obj){
   obj.db = (obj.db || 'test');
 
   if(obj.username && obj.password){
-    return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
+    return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db + "?auto_reconnect=true";
   }
   else{
     return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
@@ -29,8 +31,10 @@ var generate_mongo_url = function(obj){
 var mongourl = generate_mongo_url(mongo);
 
 /* Http Variables */
-var port = (process.env.VMC_APP_PORT || 3000);
-var host = (process.env.VCAP_APP_HOST || 'localhost');
+//var port = (process.env.VMC_APP_PORT || 3000);
+//var host = (process.env.VCAP_APP_HOST || 'localhost');
+var port = (process.env.PORT);
+var host = ('0.0.0.0');
 var http = require('http');
 
 var record_visit = function(req, res){
@@ -43,7 +47,6 @@ var record_visit = function(req, res){
       /* Insert the object then print in response */
       /* Note the _id has been created */
       coll.insert( object_to_insert, {safe:true}, function(err){
-        if(err) { console.log(err.stack); }
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.write(JSON.stringify(object_to_insert));
         res.end('\n');
@@ -52,32 +55,7 @@ var record_visit = function(req, res){
   });
 }
 
-var print_visits = function(req, res){
-  /* Connect to the DB and auth */
-  require('mongodb').connect(mongourl, function(err, conn){
-    conn.collection('ips', function(err, coll){
-      coll.find({}, {limit:10, sort:[['_id','desc']]}, function(err, cursor){
-        cursor.toArray(function(err, items){
-          res.writeHead(200, {'Content-Type': 'text/plain'});
-          for(i=0; i<items.length;i++){
-            res.write(JSON.stringify(items[i]) + "\n");
-          }
-          res.end();
-        });
-      });
-    });
-  });
-}
-
 http.createServer(function (req, res) {
-  params = require('url').parse(req.url);
-
-  if(params.pathname === '/history') {
-    print_visits(req, res);
-  }
-  else{
-    record_visit(req, res);
-  }
-
+  record_visit(req, res);
 }).listen(port, host);
 
