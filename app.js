@@ -33,8 +33,8 @@ var mongourl = generate_mongo_url(mongo);
 /* Http Variables */
 //var port = (process.env.VMC_APP_PORT || 3000);
 //var host = (process.env.VCAP_APP_HOST || 'localhost');
-var port = (process.env.PORT);
-var host = ('0.0.0.0');
+var port = (process.env.VMC_APP_PORT || process.env.PORT);
+var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 var http = require('http');
 
 var record_visit = function(req, res){
