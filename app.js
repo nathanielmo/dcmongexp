@@ -14,6 +14,13 @@ else{
 }
 
 var express = require('express');
+var application = express.createServer();
+
+application.get('/', function(request, response) {
+    response.send('Hello Express!!');
+});
+
+//application.listen(2455);
 
 //mongodb://<user>:<password>@staff.mongohq.com:10053/dcexp 
 
@@ -39,6 +46,8 @@ var port = (process.env.VMC_APP_PORT || process.env.PORT);
 var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 var http = require('http');
 
+application.listen(port, host);
+
 var record_visit = function(req, res){
   /* Connect to the DB and auth */
   require('mongodb').connect(mongourl, function(err, conn){
@@ -57,7 +66,7 @@ var record_visit = function(req, res){
   });
 }
 
-http.createServer(function (req, res) {
+/*http.createServer(function (req, res) {
   record_visit(req, res);
-}).listen(port, host);
+}).listen(port, host);*/
 
