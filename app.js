@@ -14,12 +14,18 @@ else{
 }
 
 var express = require('express');
+var jade = require('jade');
 var application = express.createServer();
 
-application.get('/', function(request, response) {
-    response.send('Hello Express!!');
-});
+//application.get('/', function(request, response) {
+//    response.send('Hello Express!!?');
+//});
 
+application.get('/', function(req, res){
+  res.render('index', {
+    title: 'Node Test'
+  });
+});
 //application.listen(2455);
 
 //mongodb://<user>:<password>@staff.mongohq.com:10053/dcexp 
@@ -45,6 +51,13 @@ var mongourl = generate_mongo_url(mongo);
 var port = (process.env.VMC_APP_PORT || process.env.PORT);
 var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 var http = require('http');
+
+application.use(express.static(__dirname + '/public'));
+application.set('views', __dirname + '/views');
+  application.set('view engine', 'jade');
+  application.use(express.bodyParser());
+  application.use(express.methodOverride());
+  application.use(application.router);
 
 application.listen(port, host);
 
