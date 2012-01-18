@@ -13,6 +13,8 @@ else{
   }
 }
 
+var express = require('express');
+
 //mongodb://<user>:<password>@staff.mongohq.com:10053/dcexp 
 
 var generate_mongo_url = function(obj){
